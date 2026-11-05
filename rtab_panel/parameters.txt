@@ -1,0 +1,22 @@
+# Online RGB-D tracking and keyframes. Full native bags remain available for offline reconstruction.
+Reg/Strategy=0
+Odom/Strategy=0
+Odom/ResetCountdown=0
+Vis/FeatureType=2
+Kp/DetectorStrategy=2
+Vis/MaxFeatures=1000
+Kp/MaxFeatures=1000
+Vis/MinDepth=0.3
+Vis/MaxDepth=6.0
+Rtabmap/DetectionRate=0
+Rtabmap/TimeThr=0
+RGBD/LinearUpdate=0.05
+RGBD/AngularUpdate=0.035
+Mem/STMSize=10
+Mem/RehearsalSimilarity=1.0
+Mem/NotLinkedNodesKept=true
+Rtabmap/StatisticLogged=true
+Rtabmap/StatisticLoggedHeaders=true
+
+# Preserve capture frame IDs in the optimized graph, including tracking gaps.
+Mem/GenerateIds=false

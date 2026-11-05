@@ -1,0 +1,6 @@
+# manual, vision or idle; every change disarms and starts a new epoch.
+string source
+---
+bool success
+uint64 epoch
+string message

@@ -1,0 +1,13 @@
+{
+  "description": "Unverified factory profile; NOT runnable. Local deployment has no native transport factory.",
+  "protocol_verified": false,
+  "localization_semantics_verified": false,
+  "mapping_navigation_concurrent_verified": false,
+  "goal_fields": {"goal_status": null, "ugly_goal_status": null, "disable_orientation": null, "updateVirtualWall": null},
+  "success_result_codes": [],
+  "operations": {"start": null, "save": null},
+  "measured_footprint_radius_m": null,
+  "measured_stop_distance_m": null,
+  "site_mapping_handshake": null,
+  "native_slam_restore": null
+}

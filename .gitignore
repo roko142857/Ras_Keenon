@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+build/
+install/
+log/
+run/
+.pytest_cache/
+
+# Additional colcon outputs and machine-local evidence
+/build_*/
+/install_*/
+/log_*/
+/backups/
+/diagnostics/
+/verification/
+
+# Local environments and credentials
+.venv/
+venv/
+.env
+.env.*
+!.env.example

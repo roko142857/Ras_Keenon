@@ -1,0 +1,6 @@
+string request_id
+string instruction
+---
+bool success
+string message
+string result_json

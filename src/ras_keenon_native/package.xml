@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ras_keenon_native</name><version>0.1.0</version>
+  <description>One process owns the matching XMAN native SDK for arms, head and waist.</description>
+  <maintainer email="operator@example.com">RAS operator</maintainer><license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend><depend>eigen</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

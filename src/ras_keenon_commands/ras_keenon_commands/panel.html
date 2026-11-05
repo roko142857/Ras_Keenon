@@ -1,0 +1,87 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keenon · 手动控制与建图</title><style>
+body{font:17px system-ui;margin:28px auto;max-width:850px;padding:0 20px;color:#18283b;background:#f4f7fb}h1{font-size:28px}section{background:white;border-radius:12px;padding:20px;margin:18px 0}button,input{font:inherit;padding:13px;border:1px solid #ccd7e5;border-radius:8px}button{cursor:pointer;background:#edf3fb;touch-action:none;user-select:none;-webkit-user-select:none}button.active{background:#1764ce;color:white}#stop{background:#b82b39;color:white;width:100%}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid button{min-height:56px}input{width:65%;box-sizing:border-box}pre{font:13px monospace;white-space:pre-wrap;overflow-wrap:anywhere}small{color:#55657c}#connection{font-weight:600}
+
+.battery-card{display:flex;align-items:center;gap:14px;min-width:0;color:#097a72;background:#fff;border:1px solid #e2e9ec;border-radius:12px;padding:13px 17px;margin:18px 0}.battery-info{flex:1;min-width:0}.battery-info strong{display:block;font-size:15px;line-height:1.5}.battery-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;line-height:1.5;color:#6a7c87}.battery-gauge{position:relative;box-sizing:border-box;width:35px;height:20px;border:2px solid currentColor;border-radius:4px;padding:2px;flex-shrink:0}.battery-gauge[hidden]{display:none}.battery-gauge:after{content:"";position:absolute;right:-5px;top:4px;width:3px;height:8px;background:currentColor;border-radius:0 2px 2px 0}.battery-gauge span{display:block;height:100%;max-width:100%;background:currentColor;border-radius:1px;transition:width .2s}.battery-refresh{border:1px solid #d7e2e4;border-radius:7px;padding:8px 11px;background:#f8fbfb;color:#47666f;font:inherit;font-size:12px;white-space:nowrap;cursor:pointer}.battery-refresh:disabled{opacity:.55;cursor:default}.battery-card[data-state="unverified"],.battery-card[data-state="stale"]{color:#926c26}.battery-card[data-state="low"]{color:#b33b40}.battery-card[data-state="mock"],.battery-card[data-state="unavailable"]{color:#788b96}
+.battery-power{display:block;font-size:11px;line-height:1.6;color:#6a7c87;margin-top:2px}</style><link rel="stylesheet" href="/mapping.css"><h1>Keenon 手动控制与建图</h1><div id="connection">正在连接</div>
+<div id="batteryWidget" class="battery-card" data-state="unavailable" aria-label="机器人电量">
+  <div id="batteryGauge" class="battery-gauge" role="img" aria-label="电量未知" hidden><span id="batteryFill"></span></div>
+  <div class="battery-info"><strong id="batteryValue">电量 —</strong><div class="battery-meta"><span id="batteryStatus" role="status">正在查询电量</span><time id="batteryUpdated"></time></div><small id="batteryPower" class="battery-power">外接电源：未确认 · 充电：未知</small></div>
+  <button id="batteryRefresh" class="battery-refresh" type="button">刷新电量</button>
+</div>
+<link rel="stylesheet" href="/rtab.css"><main class="control-workspace"><div class="map-column">
+<section id="rtabPanel" aria-label="RTAB 三维建图">
+  <div class="mapping-heading"><div><span class="eyebrow">RGB-D · RTAB-MAP</span><h2>三维建图</h2></div><span id="rtabPhase" class="mapping-pill">连接中</span></div>
+  <p class="mapping-summary">相机 RGB＋深度建图。启动后可用原有按键手动采集不同视角；本功能不会自主驾驶。</p>
+  <div class="rtab-toolbar"><span id="rtabBasis">等待首次采集</span><button id="rtabFit" type="button">复位视角</button></div>
+  <div class="rtab-view"><canvas id="rtabCanvas" aria-label="三维彩色点云与相机轨迹，拖动旋转，滚轮缩放"></canvas><div id="rtabEmpty">点击「开始 RTAB 建图」采集当前环境</div><div class="rtab-legend">拖动旋转 · 滚轮缩放 · 橙色为相机轨迹</div></div>
+  <div class="rtab-metrics"><span id="rtabPoints">0 点</span><span id="rtabFrames">0 帧</span><span id="rtabTracking">尚未采集</span></div>
+  <div class="mapping-actions"><label class="rtab-duration">时长 <select id="rtabDuration" aria-label="RTAB采集时长"><option value="15">15 秒</option><option value="30" selected>30 秒</option><option value="60">60 秒</option><option value="120">120 秒</option></select></label><button id="rtabStart" class="mapping-primary" type="button" disabled>开始 RTAB 建图</button><button id="rtabStop" type="button" disabled>停止并保存</button><span id="rtabCountdown"></span></div>
+  <p class="mapping-muted">每次最多 120 秒，可提前停止。原始 RGB-D、RTAB 数据库与轨迹自动保留；显示点云上限 45,000 点。此画面不是 MuJoCo 重建场景。</p>
+  <p id="rtabMessage" class="mapping-note" role="status"></p><details><summary>采集保存位置</summary><pre id="rtabPath">尚无采集</pre></details>
+</section>
+
+<section id="mappingPanel" aria-label="原厂手动建图">
+  <div class="mapping-heading"><div><span class="eyebrow">MAPPING WORKSPACE</span><h2>环境建图</h2></div><span id="mappingBackend" class="mapping-pill">连接中</span></div>
+  <p id="mappingSummary" class="mapping-summary" role="status">正在读取原厂状态，启动页面不会开始建图。</p>
+  <div class="map-toolbar"><span id="mappingSource">等待地图</span><div><button type="button" id="mapFit">适应地图</button><button type="button" id="mapZoomIn" aria-label="放大地图">＋</button><button type="button" id="mapZoomOut" aria-label="缩小地图">－</button></div></div>
+  <div class="mapping-canvas-wrap"><canvas id="mappingCanvas" aria-label="原厂地图，支持拖动和缩放"></canvas><div class="mapping-legend">拖动平移 · 滚轮缩放</div></div>
+  <div class="mapping-status-row"><strong id="mappingPhase">等待建图服务</strong><span id="mappingUpdated">—</span></div>
+  <p id="mappingNote" class="mapping-note">在下方创建新地图，随后用右侧按键手动驾驶探索。</p>
+  <form id="mappingForm" class="mapping-form">
+    <label>地图名称<input id="mappingName" name="name" placeholder="例如 实验室一层" maxlength="80" required></label>
+    <label>楼栋<input id="mappingBuilding" name="buildingInfo" value="LAB" maxlength="80" required></label>
+    <label>新楼层编号<input id="mappingFloor" name="floor" type="number" step="1" min="-9" max="32767" placeholder="未占用的编号" required></label>
+    <label>楼层说明<input id="mappingFloorInfo" name="floorInfo" placeholder="可留空，默认使用编号" maxlength="80"></label>
+    <button id="mappingStart" class="mapping-primary" type="submit" disabled>开始 Gmapping 建图</button>
+  </form>
+<div id="mapLibrary" class="map-library">
+ <div class="mapping-heading"><h3>已有地图管理</h3><span id="mapLibraryCurrent" class="mapping-muted"></span></div>
+ <p class="mapping-muted">选择一张地图后预览、备份或编辑；预览不会切换当前地图。</p>
+ <label class="mapping-muted" for="mapLibrarySelect">地图列表</label><select id="mapLibrarySelect" aria-label="选择已有地图"><option value="">请选择已有地图</option></select>
+ <div id="mapLibraryDetail" class="mapping-muted">尚未选择地图</div>
+ <div class="map-library-fields"><label>地图名称<input id="mapLibraryName" maxlength="80"></label><label>楼栋<input id="mapLibraryBuilding" maxlength="80"></label><label>楼层说明<input id="mapLibraryFloorInfo" maxlength="80"></label></div>
+ <div class="mapping-actions"><button id="mapLibraryPreview" type="button">预览</button><button id="mapLibraryExport" type="button">导出备份</button><button id="mapLibrarySwitch" type="button">切换到此图</button><button id="mapLibraryUpdate" type="button">保存信息</button><button id="mapLibraryReplace" type="button">覆盖重建</button></div>
+ <p class="mapping-muted">覆盖重建在收到本次新图后才更新旧图，旧图自动备份；原导航点和标签需复核。Cartographer 地图仅预览、备份、切换及编辑信息。</p>
+ <div id="mapLibraryPreviewBox" hidden><p id="mapLibraryPreviewTitle"></p><img id="mapLibraryImage" alt="所选已有地图预览"><div id="mapLibraryDownloads" class="mapping-downloads"></div></div>
+</div>
+
+  <p id="mappingExisting" class="mapping-muted">正在查询已有楼层</p>
+  <div class="mapping-actions"><button id="mappingFinish" type="button" class="mapping-primary" disabled>结束并保存</button><button id="mappingCancel" type="button" disabled>取消本次建图</button><button id="mappingExport" type="button" disabled>导出本次快照</button><button id="mappingRefresh" type="button">刷新状态</button></div>
+  <p class="mapping-muted">松键 / 空格停止驾驶，SLAM 继续采集。取消建图退出本次会话；首版保存为新楼层。快照为 PNG 与元数据，不代表可续建 SLAM 状态。</p>
+  <div id="mappingMessage" role="status" class="mapping-message"></div>
+  <div id="mappingDownloads" class="mapping-downloads"></div>
+  <details class="mapping-receipts" open><summary>建图操作回执</summary><div id="mappingReceipts">尚无操作</div></details>
+</section>
+</div><div class="manual-column">
+<section><p>按住执行，松开停止。点击空白处后可用键盘；失去焦点或窗口隐藏时发送停止。</p>
+<div class="grid"><span></span><button data-key="w">W 前进</button><span></span><button data-key="a">A 左转</button><button data-key="s">S 后退</button><button data-key="d">D 右转</button></div>
+<p></p><div class="grid"><button data-key="h">H 头左转</button><button data-key="i">I 头上仰</button><button data-key="l">L 头右转</button><button data-key="r">R 直立</button><button data-key="k">K 头下俯</button><button data-key="f">F 下蹲</button></div>
+<p><small>R/F 每次按下提交一个目标。厂商腰部与机械臂的阻塞轨迹不能由本页面保证中途停止；松键取消后续发送。头部松键发送当前位置保持。</small></p><button id="stop">空格 / 全部停止</button></section>
+<section><form id="command"><input id="instruction" placeholder="例如 h -10 1.2 或 s 0.03 -" autocomplete="off"><button type="submit">执行指令</button></form><p><small>指令输入框内暂停快捷键。h/v 角度单位为度；s 为下蹲高度（米）；g 读取；help 查看指令。</small></p><pre id="result">等待指令</pre></section>
+<section><strong>当前读数 / 输出</strong><pre id="readings"></pre></section></div></main>
+<script>
+const held=new Set(), keyboard=new Set(), pointers=new Map(), client=crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
+let seq=0, lastMode='', session=null;
+const result=document.querySelector('#result'), connection=document.querySelector('#connection');
+async function post(path,data,keepalive=false){const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),keepalive});const v=await r.json();if(!r.ok)throw Error(v.error||r.status);return v;}
+function adopt(value){if(value===null||value===undefined)return false;if(value===session)return false;if(session===null){session=value;return false;}clearLocal();session=value;return true;}
+function clearLocal(){keyboard.clear();pointers.clear();held.clear();paint();}
+function send(retry=true){const data={keys:[...held],client,seq:++seq,session};post('/keys',data,true).catch(async e=>{if(retry&&/session/.test(e.message)){try{adopt((await (await fetch('/readings')).json()).session);send(false);return;}catch(_){}}connection.textContent='连接失败：'+e.message;});}
+function rebuild(){held.clear();for(const k of keyboard)held.add(k);for(const k of pointers.values())held.add(k);paint();send();}
+function paint(){document.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('active',held.has(b.dataset.key)));}
+function clear(){clearLocal();send();}
+function allStop(){clear();post('/stop',{},true).then(v=>adopt(v.session)).catch(()=>{});}
+const valid=new Set('wsadhlikrf');
+window.addEventListener('keydown',e=>{if(e.repeat||e.target.closest('input,textarea,select,[contenteditable=true]'))return;if(e.code==='Space'){e.preventDefault();allStop();return;}const k=e.key.toLowerCase();if(valid.has(k)){e.preventDefault();if(!keyboard.has(k)){keyboard.add(k);rebuild();}}});
+window.addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(keyboard.delete(k)){e.preventDefault();rebuild();}});
+for(const b of document.querySelectorAll('[data-key]')){b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);pointers.set(e.pointerId,b.dataset.key);rebuild();});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,e=>{if(pointers.delete(e.pointerId))rebuild();});}
+document.querySelector('#stop').onclick=allStop;
+window.addEventListener('blur',clear);window.addEventListener('pagehide',clear);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clear();});
+document.addEventListener('focusin',e=>{if(e.target.matches('input,textarea,select,[contenteditable=true]'))clear();});
+setInterval(()=>{if(held.size)send();},100);
+document.querySelector('#command').onsubmit=async e=>{e.preventDefault();clear();try{const v=await post('/command',{instruction:document.querySelector('#instruction').value,session});result.textContent='指令已提交';for(;;){const r=await fetch('/result/'+v.id);const t=await r.json();if(!r.ok)throw Error(t.error);if(t.done){result.textContent=(t.success?'完成：':'已停止 / 失败：')+t.message+'\n'+(t.result.help||JSON.stringify(t.result,null,2));break;}await new Promise(resolve=>setTimeout(resolve,100));}}catch(e){if(/session/.test(e.message)){try{adopt((await (await fetch('/readings')).json()).session);}catch(_){}}result.textContent=e.message;}};
+setInterval(async()=>{try{const r=await fetch('/readings');if(!r.ok)throw Error(r.status);const data=await r.json();if(adopt(data.session))send(false);lastMode=data.backend;connection.textContent=(lastMode==='mock'?'模拟模式':'真实硬件模式')+' · 已连接 · 无需使能';document.querySelector('#readings').textContent=JSON.stringify(data,null,2);}catch(e){connection.textContent='连接中断';}},500);
+fetch('/readings').then(r=>r.json()).then(d=>{adopt(d.session);send();}).catch(()=>{});
+</script><script type="module">import {mountBatteryWidget} from '/battery.js';mountBatteryWidget({endpoint:'/battery'});</script><script type="module">import {mountMappingPanel} from '/mapping.js';mountMappingPanel({clearKeys:clear,adoptSession:adopt});</script><script type="module">import {mountRtabPanel} from "/rtab.js";mountRtabPanel({clearKeys:clear});</script></html>

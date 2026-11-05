@@ -1,0 +1,14 @@
+{
+  "port": 18782,
+  "capture_port": 18766,
+  "output_root": "/run/homebody-real2sim-nvme/homebody-real2sim-data/rtabmap/20261027-v1/rtab-panel-runs",
+  "python": "/run/homebody-real2sim-nvme/homebody-real2sim-data/rtabmap/20261027-v1/20261029-explore-runtime/venv/bin/python",
+  "tools": "/home/peanut/incoming-20261105-deepseek-static-v1/capture-tools",
+  "camera": "/home/peanut/incoming-20261105-deepseek-static-v1/capture-tools/recording/native_rgbd",
+  "rtabmap": "/run/homebody-real2sim-nvme/homebody-real2sim-data/rtabmap/20261027-v1/build-opencv45/rtabmap_offline",
+  "parameters": "/home/peanut/ras_keenon_ws/rtab_panel/parameters.txt",
+  "profile": "/run/homebody-real2sim-nvme/homebody-real2sim-data/rtabmap/20261027-v1/20261029-explore-runtime/source-v51/profile.json",
+  "robot_root": "/home/peanut/homebody",
+  "service_lock": "/home/peanut/ras_keenon_ws/run/rtab-panel.lock",
+  "default_seconds": 30
+}

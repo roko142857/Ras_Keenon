@@ -1,0 +1,13 @@
+# Loaded by ras_keenon_control/manual.launch.py and ras_keenon_commands/direct.launch.py.
+# Match direct_controller in any namespace, including namespace:=custom_name.
+/**/direct_controller:
+  ros__parameters:
+    speed: 0.1            # W/S linear speed, m/s; finite, >= 0; no commissioning cap
+    turn_speed: 0.1       # A/D angular speed, rad/s; finite, >= 0; no commissioning cap
+    cycle_ms: 2.0          # Input processing period, ms
+    base_period_ms: 20.0  # Chassis output period, ms
+    key_timeout: 0.3      # Clear held keys if no input heartbeat arrives, s
+    base_timeout: 0.25    # Output zero if chassis target is not refreshed, s
+    body_period_ms: 50.0  # Head/body update period, ms
+    head_rate: 5.0        # H/L/I/K head angular speed, deg/s
+    squat_height: 0.03   # F squat target, m; 0.0 .. 0.273

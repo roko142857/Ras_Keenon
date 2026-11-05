@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ras_keenon_chat</name><version>0.1.0</version>
+  <description>OpenAI-compatible conversation console with robot tools and persisted receipts.</description>
+  <maintainer email="operator@example.com">RAS operator</maintainer><license>Apache-2.0</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>ras_keenon_demos</exec_depend><exec_depend>launch</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

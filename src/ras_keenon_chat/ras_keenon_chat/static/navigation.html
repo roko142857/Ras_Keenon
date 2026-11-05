@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Keenon · 自主探索</title><link rel="stylesheet" href="/navigation.css"></head>
+<body>
+<header class="topbar"><a class="brand" href="/">K<span>KEENON <small>导航与探索</small></span></a><span class="pill" id="backendBadge">本地模拟</span><span class="connection" id="connection">连接中</span><span class="battery">电量 — · 本地不读取机器人</span><button id="modelSettings">模型设置</button><button class="danger" id="stopTask">■ 停止任务</button></header>
+<div class="notice" id="backendNotice">合成双房间环境 · 模拟 360° 扫描 · 不连接机器人。栅格导出可回放，不能作为真实 SLAM 地图。</div>
+<div class="shell">
+<aside class="sidebar">
+  <h2>探索任务</h2><label class="field">任务时限（秒）<input id="duration" type="number" min="1" max="7200" value="600"></label>
+  <button class="primary block" id="startExplore">开始模拟探索</button>
+  <div class="button-row"><button id="pauseTask">暂停</button><button id="resumeTask">继续</button></div>
+  <button class="block" id="finishTask">结束并保存</button>
+  <button class="block subtle" id="manualPreempt">模拟手动接管</button>
+  <hr><h2>探索范围</h2><label class="field">地图操作<select id="mapMode"><option value="browse">拖动 / 缩放</option><option value="waypoint">添加命名点 / 拖拽朝向</option><option value="region">绘制探索区域</option><option value="exclusion">绘制禁入区</option></select></label>
+  <div class="button-row"><button id="applyRegion">应用绘制</button><button id="undoVertex">撤销点</button></div>
+  <button class="block subtle" id="clearRegion">清除区域与禁入区</button>
+  <button class="block" id="preview">预览探索候选</button>
+  <p class="hint" id="mapHint">滚轮缩放，拖动地图。添加目标需在已知可达区域内。</p>
+  <hr><h2>地图快照</h2><button class="block" id="saveMap">保存模拟地图</button><div id="exports" class="exports"></div>
+</aside>
+<main>
+  <div class="map-heading"><div><h1>探索地图</h1><p id="mapMeta">等待地图</p></div><button id="fitMap">适应地图</button></div>
+  <div class="map-wrap" id="mapWrap"><canvas id="mapCanvas" tabindex="0" aria-label="模拟探索地图，支持拖动、缩放、选点和绘制区域"></canvas><div class="map-legend"><span><i class="known"></i>已知区域</span><span><i class="unknown"></i>未知</span><span><i class="frontier"></i>探索候选</span><span><i class="route"></i>计划路径</span></div><span class="map-coordinates" id="coordinates">map · 米</span></div>
+  <section class="task-status" aria-live="polite"><div><span class="eyebrow">任务状态</span><strong id="taskState">待开始</strong><p id="taskReason">预览边界，或开始一次模拟探索。</p></div><div class="metrics"><span><b id="knownArea">—</b>已知面积 m²</span><span><b id="targetCount">0</b>已到达目标</span><span><b id="elapsed">0</b>运行秒数</span></div></section>
+  <section class="waypoint-area"><div class="section-title"><h2>命名点与路线</h2><span id="routeCount">0 个路径点</span></div><div class="waypoint-form"><input id="waypointName" aria-label="命名点名称" placeholder="名称，例如：桌边"><input id="waypointYaw" aria-label="目标朝向（度）" type="number" value="0" min="-180" max="180"><button id="saveWaypoint">保存选点</button><span id="selectedPoint">尚未选点</span></div><div id="waypoints" class="waypoints"></div><ol id="routeSteps" class="route-steps"></ol><div class="route-actions"><input id="routeName" aria-label="路线名称" placeholder="路线名称"><button id="saveRoute">保存路线</button><select id="savedRoutes" aria-label="已保存路线"><option value="">选择已保存路线</option></select><button class="primary" id="runRoute">执行模拟路线</button></div></section>
+</main>
+<aside class="conversation"><div class="section-title"><h2>对话规划</h2><span class="pill" id="llmMode">演示规则</span></div><p class="hint" id="navigationChatHint">可输入“开始探索”“暂停探索”或“保存地图”。API 模式使用同一套导航工具。</p><div class="chat-messages" id="chatMessages" aria-live="polite"><p class="empty" id="navigationChatEmpty">让模型安排高层任务，地图展示实际模拟进度。</p></div><form id="chatForm"><textarea id="chatInput" aria-label="导航对话输入框" rows="3" placeholder="开始探索当前区域"></textarea><div class="button-row"><small>Enter 发送 · Shift + Enter 换行</small><button class="primary" id="sendChat">发送</button></div></form><div class="receipt-heading"><h2>模型与任务回执</h2><span id="receiptCount">0</span></div><div id="chatReceipts" class="chat-receipts"></div><details><summary>最近导航事件</summary><div id="events" class="events"></div></details></aside>
+</div>
+<div class="toast" id="toast" role="alert" hidden></div>
+<dialog id="settingsDialog"><form id="settingsForm"><h2>模型设置</h2><p class="hint" id="settingsHint">导航服务始终为本地模拟。API Key 仅保存在对话后端内存。</p><label class="field">对话模式<select id="settingMode"><option value="demo">离线演示规则</option><option value="api">兼容 API</option></select></label><label class="field">API Base URL<input id="settingBase" placeholder="https://example.com/v1"></label><label class="field">模型名称<input id="settingModel"></label><label class="field">API Key<input id="settingKey" type="password" autocomplete="off" placeholder="留空保留当前 Key"></label><div class="button-row"><button type="button" id="closeSettings">取消</button><button class="primary" type="submit">保存设置</button></div></form></dialog>
+<script type="module" src="/navigation.js"></script>
+</body></html>

@@ -1,0 +1,29 @@
+# Historical controller only. Current manual.launch.py uses
+# ras_keenon_commands/config/manual.yaml instead.
+/ras_keenon/controller:
+  ros__parameters:
+    base_speed: 0.1
+    yaw_speed: 0.2
+    command_age: 0.4
+    base_timeout: 0.25
+    burst_s: 2.0
+    # Anchor a small session window to fresh measured head feedback; never move to zero.
+    head_window_mode: startup_relative
+    head_yaw_span: 1.0
+    head_pitch_span: 0.1
+    # Used only with head_window_mode: absolute.
+    yaw_min: -5.099835
+    yaw_max: -2.999835
+    pitch_min: -0.233209
+    pitch_max: -0.033209
+    head_step: 0.5
+    waist_max: 0.05
+    arm_step: 0.04
+    base_host: "192.168.64.20"
+    base_port: 9091
+/ras_keenon/keyboard:
+  ros__parameters:
+    speed: 0.1
+    yaw_speed: 0.2
+    squat_height: 0.03
+    key_timeout: 0.6

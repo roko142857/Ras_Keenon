@@ -1,0 +1,10 @@
+<section id="rtabPanel" aria-label="RTAB 三维建图">
+  <div class="mapping-heading"><div><span class="eyebrow">RGB-D · RTAB-MAP</span><h2>三维建图</h2></div><span id="rtabPhase" class="mapping-pill">连接中</span></div>
+  <p class="mapping-summary">相机 RGB＋深度建图。启动后可用原有按键手动采集不同视角；本功能不会自主驾驶。</p>
+  <div class="rtab-toolbar"><span id="rtabBasis">等待首次采集</span><button id="rtabFit" type="button">复位视角</button></div>
+  <div class="rtab-view"><canvas id="rtabCanvas" aria-label="三维彩色点云与相机轨迹，拖动旋转，滚轮缩放"></canvas><div id="rtabEmpty">点击「开始 RTAB 建图」采集当前环境</div><div class="rtab-legend">拖动旋转 · 滚轮缩放 · 橙色为相机轨迹</div></div>
+  <div class="rtab-metrics"><span id="rtabPoints">0 点</span><span id="rtabFrames">0 帧</span><span id="rtabTracking">尚未采集</span></div>
+  <div class="mapping-actions"><label class="rtab-duration">时长 <select id="rtabDuration" aria-label="RTAB采集时长"><option value="15">15 秒</option><option value="30" selected>30 秒</option><option value="60">60 秒</option><option value="120">120 秒</option><option value="until-stop">持续到停止</option></select></label><button id="rtabStart" class="mapping-primary" type="button" disabled>开始 RTAB 建图</button><button id="rtabStop" type="button" disabled>停止并保存</button><span id="rtabCountdown"></span></div>
+  <p class="mapping-muted">可选定时或持续到停止，均可提前保存；磁盘空间不足时自动收尾。原始 RGB-D、RTAB 数据库与轨迹自动保留；显示点云上限 45,000 点，轨迹显示最近 10,000 帧；完整数据保留在文件中。此画面不是 MuJoCo 重建场景。</p>
+  <p id="rtabMessage" class="mapping-note" role="status"></p><details><summary>采集保存位置</summary><pre id="rtabPath">尚无采集</pre></details>
+</section>
